@@ -19,16 +19,16 @@ def find_point_before(polyline, position_along):
         return location
 
 
-def get_normal(polyline, dist, left=True, perpandicular_distance=0.05):
+def get_normal(polyline, dist, left=True, perpendicular_distance=0.05):
     line_part = polyline.getPart(0)
     distance = dist
     start_point_position = find_point_before(polyline, dist)
     start_point = polyline.positionAlongLine(start_point_position, False)
-    point = polyline.positionAlongLine(dist, False)
+    point = polyline.positionAlongLine(dist, True)
     dx, dy = get_slope(start_point.centroid, point.centroid)
     segment_angle = math.degrees(math.atan2(dy, dx))
-    delta_x = math.cos(math.radians(segment_angle - 90)) * perpandicular_distance
-    delta_y = math.sin(math.radians(segment_angle - 90)) * perpandicular_distance
+    delta_x = math.cos(math.radians(segment_angle - 90)) * perpendicular_distance
+    delta_y = math.sin(math.radians(segment_angle - 90)) * perpendicular_distance
     if left == False:
         delta_x = delta_x * -1
         delta_y = delta_y * -1
