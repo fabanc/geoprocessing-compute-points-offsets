@@ -59,6 +59,13 @@ def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, l
         with arcpy.da.InsertCursor(points_fc, ['ORIG_FID', 'SHAPE@']) as insert_cursor:
             for line_rows in search_cursor:
                 polyline = line_rows[1]
+                if polyline.partCount > 1:
+                    arcpy.AddError(
+                        'The polyline with id {} is a multipart ({}), which is not supported. This feature will be skipped.'.format(
+                            line_rows[0],
+                            polyline.partCount
+                        ))
+                    continue
                 point = get_normal(polyline, ratio, left, perpendicular_distance)
                 insert_cursor.insertRow((line_rows[0], point))
 
