@@ -1,8 +1,8 @@
-# Compute Points Offsets
+# Create Offsets Points
 
 ## Description
 
-This tool creates offset points along line. Offset points are characterized by:
+This tool creates offset points from an input line feature class. Offset points are characterized by:
  - A position along a the source line.
  - A side (left or right of the line)
  - A distance from the line
