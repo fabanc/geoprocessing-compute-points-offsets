@@ -61,7 +61,7 @@ def get_offset_point(polyline, ratio, left=True, perpendicular_distance=0.05):
     return [x, y]
 
 
-def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, left=True):
+def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, left=True, ratio_field=None):
     """
     Generates an output feature class of offet points based on the input line feature class.
     :param line_fc: The input line feature class
@@ -69,6 +69,7 @@ def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, l
     :param ratio: The ratio on which each point will be drawn on the feature class.
     :param perpendicular_distance: The offset distance.
     :param left: If true, the offset will be drawn on the left of the line. It will be drawn on the right otherwise.
+    :param ratio_field: The field that contains the ratio along line for the segment. Will override the ratio value for each feature if provided.
     :return:
     """
 
@@ -80,11 +81,22 @@ def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, l
     arcpy.AddMessage('Output Workspace: {}'.format(workspace))
     arcpy.CreateFeatureclass_management(workspace, workspace_split[-1], 'POINT', spatial_reference=line_fc)
     arcpy.AddField_management(points_fc, 'ORIG_FID', 'DOUBLE')
-    with arcpy.da.SearchCursor(line_fc, ['OID@', 'SHAPE@'], where_clause='1=1') as search_cursor:
+
+    # Leverage the ratio field if provided.
+    search_fields = ['OID@', 'SHAPE@']
+    if ratio_field is not None:
+        search_fields.append(ratio_field)
+
+    with arcpy.da.SearchCursor(line_fc, search_fields, where_clause='1=1') as search_cursor:
         with arcpy.da.InsertCursor(points_fc, ['ORIG_FID', 'SHAPE@']) as insert_cursor:
             for line_rows in search_cursor:
                 polyline = line_rows[1]
-                point = get_offset_point(polyline, ratio, left, perpendicular_distance)
+                feature_ratio = line_rows[2] if ratio_field is not None else ratio
+                if feature_ratio is None:
+                    arcpy.AddWarning(
+                        'Set to use ratio field but no value provided for id {}. Default ratio used.'.format(line_rows[0])
+                    )
+                point = get_offset_point(polyline, feature_ratio, left, perpendicular_distance)
                 insert_cursor.insertRow((line_rows[0], point))
 
 
@@ -94,4 +106,13 @@ if __name__ == '__main__':
     ratio = float(arcpy.GetParameterAsText(2))
     perpendicular_distance = float(arcpy.GetParameterAsText(3))
     use_left = arcpy.GetParameter(4)
-    parse_line_features(input_lines_features, output_points_features, ratio, perpendicular_distance, use_left)
+    ratio_field = None if arcpy.GetParameterAsText(5) in ["#", ''] else arcpy.GetParameterAsText(5)
+
+    parse_line_features(
+        input_lines_features,
+        output_points_features,
+        ratio,
+        perpendicular_distance,
+        use_left,
+        ratio_field
+    )
