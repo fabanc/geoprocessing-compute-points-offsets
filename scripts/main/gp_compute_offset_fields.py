@@ -2,13 +2,26 @@ import math
 import arcpy
 import os
 
+
 def get_slope(start, end):
+    """
+    Return a tuple that contains the x and y delta between two points.
+    :param start: The start point. Must have X and Y attributes.
+    :param end: The end point. Must have X and Y attributes.
+    :return: A 2 elements tuple. The first element is the x-delta, the second is the y-delta.
+    """
     dy = end.Y - start.Y
     dx = end.X - start.X
     return dx, dy
 
 
 def find_point_before(polyline, position_along):
+    """
+    Find the point on the polyline ahead of the position passed as parameter.
+    :param polyline: The polyline
+    :param position_along: The position along the segment to query.
+    :return: a number between 0 and 1
+    """
     if position_along < 0 or position_along > 1:
         raise Exception('parameter position_along should have a value between 0 and 1')
 
@@ -24,10 +37,18 @@ def find_point_before(polyline, position_along):
     return location
 
 
-def get_normal(polyline, dist, left=True, perpendicular_distance=0.05):
-    start_point_position = find_point_before(polyline, dist)
+def get_offset_point(polyline, ratio, left=True, perpendicular_distance=0.05):
+    """
+    Returns the point along the line with an offset. This the point used to draw the normal line to a polyline.
+    :param polyline: The input polyline
+    :param ratio: The ratio. A value between 0 and 1.
+    :param left: If true, the offset will be drawn on the left side of the input line. Other wise, the offset point will be on the right.
+    :param perpendicular_distance: The distance from the line on which the input point will be. Uses the input feature class projection unit.
+    :return: An array representing the offset point. The first element represents the X value, the second the Y value.
+    """
+    start_point_position = find_point_before(polyline, ratio)
     start_point = polyline.positionAlongLine(start_point_position, False)
-    point = polyline.positionAlongLine(dist, True)
+    point = polyline.positionAlongLine(ratio, True)
     dx, dy = get_slope(start_point.centroid, point.centroid)
     segment_angle = math.degrees(math.atan2(dy, dx))
     delta_x = math.cos(math.radians(segment_angle - 90)) * perpendicular_distance
@@ -42,11 +63,12 @@ def get_normal(polyline, dist, left=True, perpendicular_distance=0.05):
 
 def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, left=True):
     """
-
-    :param line_fc:
-    :param points_fc:
-    :param ratio:
-    :param left:
+    Generates an output feature class of offet points based on the input line feature class.
+    :param line_fc: The input line feature class
+    :param points_fc: The output offset points feature class
+    :param ratio: The ratio on which each point will be drawn on the feature class.
+    :param perpendicular_distance: The offset distance.
+    :param left: If true, the offset will be drawn on the left of the line. It will be drawn on the right otherwise.
     :return:
     """
 
@@ -62,14 +84,7 @@ def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, l
         with arcpy.da.InsertCursor(points_fc, ['ORIG_FID', 'SHAPE@']) as insert_cursor:
             for line_rows in search_cursor:
                 polyline = line_rows[1]
-                # if polyline.partCount > 1:
-                #     arcpy.AddError(
-                #         'The polyline with id {} is a multipart ({}), which is not supported. This feature will be skipped.'.format(
-                #             line_rows[0],
-                #             polyline.partCount
-                #         ))
-                #     continue
-                point = get_normal(polyline, ratio, left, perpendicular_distance)
+                point = get_offset_point(polyline, ratio, left, perpendicular_distance)
                 insert_cursor.insertRow((line_rows[0], point))
 
 
