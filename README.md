@@ -1,4 +1,4 @@
-# geoprocessing-compute-points-offsets
+# Compute Points Offsets
 
 ## Description
 
