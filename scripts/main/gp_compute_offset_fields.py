@@ -9,19 +9,22 @@ def get_slope(start, end):
 
 
 def find_point_before(polyline, position_along):
-    part = polyline.getPart(0)
+    if position_along < 0 or position_along > 1:
+        raise Exception('parameter position_along should have a value between 0 and 1')
+
+    parts_count = polyline.partCount
     location = 0
-    for p in part:
-        new_location = polyline.measureOnLine(p, False)
-        if new_location >= position_along:
-            return location
-        location = new_location
-        return location
+    for part_index in range(0, parts_count):
+        part = polyline.getPart(part_index)
+        for p in part:
+            new_location = polyline.measureOnLine(p, True)
+            if new_location >= position_along:
+                return location
+            location = new_location
+    return location
 
 
 def get_normal(polyline, dist, left=True, perpendicular_distance=0.05):
-    line_part = polyline.getPart(0)
-    distance = dist
     start_point_position = find_point_before(polyline, dist)
     start_point = polyline.positionAlongLine(start_point_position, False)
     point = polyline.positionAlongLine(dist, True)
@@ -59,13 +62,13 @@ def parse_line_features(line_fc, points_fc, ratio, perpendicular_distance=0.5, l
         with arcpy.da.InsertCursor(points_fc, ['ORIG_FID', 'SHAPE@']) as insert_cursor:
             for line_rows in search_cursor:
                 polyline = line_rows[1]
-                if polyline.partCount > 1:
-                    arcpy.AddError(
-                        'The polyline with id {} is a multipart ({}), which is not supported. This feature will be skipped.'.format(
-                            line_rows[0],
-                            polyline.partCount
-                        ))
-                    continue
+                # if polyline.partCount > 1:
+                #     arcpy.AddError(
+                #         'The polyline with id {} is a multipart ({}), which is not supported. This feature will be skipped.'.format(
+                #             line_rows[0],
+                #             polyline.partCount
+                #         ))
+                #     continue
                 point = get_normal(polyline, ratio, left, perpendicular_distance)
                 insert_cursor.insertRow((line_rows[0], point))
 
