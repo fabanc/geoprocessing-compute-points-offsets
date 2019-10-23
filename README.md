@@ -9,12 +9,9 @@ This tool creates offset points from an input line feature class. Offset points 
 
 A position must be a value between 0 and 1, 0 being the first point of the line, and 1 being the end point of the line. The same position along line can be used for all features or a different position can be used for each individual feature by using a field. The logic is similar to using a distance field when working with buffers in ArcGIS.
 
- ## Requirements
+## Requirements
 
- This tool is designed and tested for both ArcGIS Pro 2.4 and ArcMap 10.7.1.
-
- ## How to run This tool is designed and tested for ArcGIS Pro.
- ## Hw to run
+This tool is designed and tested for both ArcGIS Pro 2.4 and ArcMap 10.7.1.
 
 Check the description associated with the tool for more information.
  
