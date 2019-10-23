@@ -11,18 +11,34 @@ A position must be a value between 0 and 1, 0 being the first point of the line,
 
  ## Requirements
 
+ This tool is designed and tested for both ArcGIS Pro 2.4 and ArcMap 10.7.1.
+
+ ## How to run This tool is designed and tested for ArcGIS Pro.
+ ## Hw to run
+
+Check the description associated with the tool for more information.
+
+## Different position along line per feature
+ 
+ ### Tool Create Offset Points
+
  This tool is designed and tested for ArcGIS Pro.
 
  ## How to run
 
 Check the description associated with the tool for more information.
 
-## Different position along line per featrure
+## Different position along line per feature
+Check the description associated with the tool for more information. The tool takes parameters:
+ - Input Lines: The input line feature classes.
+ - Output Points: The output offset points.
+ - Ratio: The position along the line used to create the offset. The position must be between 0 and 1. 0 represent the position at the first vertex, and 1 the position at the last vertex.
+ - Perpendicular Distance: The distance away from the line at which the offset point will be created.
+ - Use Left: If true, the offset will be drawn on the left of the segment. Otherwise, the tool will be drawn on the right.
+ - Ratio Field: A field to determine the position along the line. This is optional, and will override the default ration value if provided.
+ - Distance Field: A field to determine the distance of the offset point from the line. This is optional, and will override the default perpendicular distance value if provided.
 
-To be documented. 
 
-The value represented the position on a line at a specific distance can be computed in a field and then used as in input to the tool. Assuming your input feature class uses meters as a distance unit, here is the field calculator expression to get the position along the line at 0.5 meters from the starting node: `!Shape!.measureOnLine(!Shape!.positionAlongLine(0.5, False), True)`
+## Different position along line per feature
 
- ## Output
-
- A point feature class. The output feature class will have a field called ORIG_FID that can be used to trace back the source feature it was created from.
+The value represented the position on a line at a specific distance can be computed for each features. See the sample expressions in the subfolder `sample-calculator-expressions`
