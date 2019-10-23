@@ -20,11 +20,11 @@ Check the description associated with the tool for more information.
 
 ## Different position along line per feature
  
- ### Tool Create Offset Points
+### Tool Create Offset Points
 
- This tool is designed and tested for ArcGIS Pro.
+This tool is designed and tested for ArcGIS Pro 2.4 and ArcMap 10.7.1.
 
- ## How to run
+## How to run
 
 Check the description associated with the tool for more information.
 
