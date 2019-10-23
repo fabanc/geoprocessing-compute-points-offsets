@@ -17,8 +17,6 @@ A position must be a value between 0 and 1, 0 being the first point of the line,
  ## Hw to run
 
 Check the description associated with the tool for more information.
-
-## Different position along line per feature
  
 ### Tool Create Offset Points
 
@@ -26,9 +24,6 @@ This tool is designed and tested for ArcGIS Pro 2.4 and ArcMap 10.7.1.
 
 ## How to run
 
-Check the description associated with the tool for more information.
-
-## Different position along line per feature
 Check the description associated with the tool for more information. The tool takes parameters:
  - Input Lines: The input line feature classes.
  - Output Points: The output offset points.
